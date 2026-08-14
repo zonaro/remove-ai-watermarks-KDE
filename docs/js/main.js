@@ -6,16 +6,33 @@
 (function () {
   'use strict';
 
-  // Ano no rodapé
-  document.getElementById('year').textContent = new Date().getFullYear();
+  // ---------- Ano no rodapé ----------
+  function setYear() {
+    var el = document.getElementById('year');
+    if (el) el.textContent = new Date().getFullYear();
+  }
+
+  // ---------- i18n ----------
+  function initI18n() {
+    if (!window.RAIW_I18N) return;
+    RAIW_I18N.applyLang(RAIW_I18N.detectLang());
+    setYear();
+
+    document.querySelectorAll('.lang-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        RAIW_I18N.applyLang(btn.getAttribute('data-lang'));
+        setYear();
+      });
+    });
+  }
 
   // ---------- Botões de copiar ----------
   document.querySelectorAll('.copy-btn').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var text = btn.getAttribute('data-copy') || '';
       var done = function () {
-        var original = btn.textContent;
-        btn.textContent = 'Copiado ✓';
+        var original = btn.getAttribute('data-copy-label') || 'Copy';
+        btn.textContent = btn.getAttribute('data-copy-done') || 'Copied ✓';
         btn.classList.add('copied');
         setTimeout(function () {
           btn.textContent = original;
@@ -44,7 +61,7 @@
       document.execCommand('copy');
       done();
     } catch (e) {
-      btn.textContent = 'Erro';
+      btn.textContent = btn.getAttribute('data-copy-error') || 'Error';
     }
     document.body.removeChild(ta);
   }
@@ -91,4 +108,7 @@
       nav.style.boxShadow = 'none';
     }
   }, { passive: true });
+
+  // ---------- Inicializa i18n ----------
+  initI18n();
 })();
