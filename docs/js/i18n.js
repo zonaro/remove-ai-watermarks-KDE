@@ -73,10 +73,10 @@
       },
       install: {
         title: 'Instalação',
-        subtitle: 'Primeiro instale o CLI <code>remove-ai-watermarks</code>, depois rode o instalador.',
+        subtitle: 'O instalador instala o CLI <code>remove-ai-watermarks</code> automaticamente se necessário.',
         step1: {
-          title: 'Instale o CLI',
-          desc: 'O projeto é um front-end para o <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a> — ele precisa estar no seu <code>PATH</code>.'
+          title: 'Instale o CLI (opcional)',
+          desc: 'O instalador instala automaticamente. Para instalar manualmente:'
         },
         step2: {
           title: 'Instale os menus de contexto',
@@ -111,7 +111,7 @@
       uninstall: {
         title: 'Desinstalação',
         subtitle: 'Remove todos os menus de contexto e o script auxiliar — sem tocar nas suas imagens limpas.',
-        note: 'A desinstalação <strong>não</strong> remove o CLI <code>remove-ai-watermarks</code> nem os arquivos <code>_ai_cleaned</code> que você gerou.'
+        note: 'A desinstalação <strong>não</strong> remove o CLI <code>remove-ai-watermarks</code> nem os arquivos <code>_ai_cleaned</code> que você gerou. Para remover também o CLI, use <code>--deps</code>.'
       },
       footer: {
         desc: 'Um front-end open source para o <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a>.',
@@ -186,10 +186,10 @@
       },
       install: {
         title: 'Installation',
-        subtitle: 'First install the <code>remove-ai-watermarks</code> CLI, then run the installer.',
+        subtitle: 'The installer installs the <code>remove-ai-watermarks</code> CLI automatically when needed.',
         step1: {
-          title: 'Install the CLI',
-          desc: 'This project is a front-end for <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a> — it must be on your <code>PATH</code>.'
+          title: 'Install the CLI (optional)',
+          desc: 'The installer does this automatically. To install manually:'
         },
         step2: {
           title: 'Install the context menus',
@@ -224,7 +224,7 @@
       uninstall: {
         title: 'Uninstallation',
         subtitle: 'Removes all context menus and the helper script — without touching your cleaned images.',
-        note: 'Uninstalling does <strong>not</strong> remove the <code>remove-ai-watermarks</code> CLI or the <code>_ai_cleaned</code> files you generated.'
+        note: 'Uninstalling does <strong>not</strong> remove the <code>remove-ai-watermarks</code> CLI or the <code>_ai_cleaned</code> files you generated. To also remove the CLI, use <code>--deps</code>.'
       },
       footer: {
         desc: 'An open source front-end for <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a>.',
@@ -299,10 +299,10 @@
       },
       install: {
         title: 'Instalación',
-        subtitle: 'Primero instala el CLI <code>remove-ai-watermarks</code> y luego ejecuta el instalador.',
+        subtitle: 'El instalador instala el CLI <code>remove-ai-watermarks</code> automáticamente si es necesario.',
         step1: {
-          title: 'Instala el CLI',
-          desc: 'Este proyecto es un front-end para <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a> — debe estar en tu <code>PATH</code>.'
+          title: 'Instala el CLI (opcional)',
+          desc: 'El instalador lo hace automáticamente. Para instalar manualmente:'
         },
         step2: {
           title: 'Instala los menús de contexto',
@@ -337,7 +337,7 @@
       uninstall: {
         title: 'Desinstalación',
         subtitle: 'Elimina todos los menús de contexto y el script auxiliar — sin tocar tus imágenes limpias.',
-        note: 'La desinstalación <strong>no</strong> elimina el CLI <code>remove-ai-watermarks</code> ni los archivos <code>_ai_cleaned</code> que generaste.'
+        note: 'La desinstalación <strong>no</strong> elimina el CLI <code>remove-ai-watermarks</code> ni los archivos <code>_ai_cleaned</code> que generaste. Para eliminar también el CLI, usa <code>--deps</code>.'
       },
       footer: {
         desc: 'Un front-end de código abierto para <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a>.',

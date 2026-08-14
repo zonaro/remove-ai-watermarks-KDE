@@ -21,13 +21,17 @@ installed, and installs the menu in **all compatible managers** found.
 ## Requirements
 
 - One of the supported desktop environments / file managers above
-- **`remove-ai-watermarks`** — this project is a front-end for it and **must be
-  installed first**:
+- **`remove-ai-watermarks`** — this project is a front-end for it. The
+  installer **automatically installs it** (via `uv`) when it's not already on
+  your `PATH`. To skip this, use `--no-deps`:
 
   ```bash
-  uv tool install --force "remove-ai-watermarks[visible]"
+  curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash -s -- --no-deps
   ```
 
+  The dependency installer detects your distro, installs `uv` (via your
+  package manager or the official installer), and runs
+  `uv tool install --force --python 3.12 "remove-ai-watermarks[all]"`.
   See the [remove-ai-watermarks repository](https://github.com/wiltodelta/remove-ai-watermarks)
   for other feature sets (video, invisible removal, etc.).
 - `kdialog` (KDE), `zenity` (GNOME) or `notify-send` — used for popup
@@ -63,6 +67,14 @@ manager:
 curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash -s -- --all
 ```
 
+Options:
+
+| Flag | Effect |
+|---|---|
+| `--all` | Install in every supported file manager |
+| `--no-deps` | Skip installing the `remove-ai-watermarks` CLI |
+| `--force-deps` | Reinstall the CLI even if already present |
+
 After installing, restart your file manager once so the menu appears:
 
 ```bash
@@ -81,7 +93,11 @@ curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-context
 
 Uninstalling removes the context menus and the helper script, but **does not**
 remove the `remove-ai-watermarks` tool itself nor any `_ai_cleaned` files you
-generated.
+generated. To also remove the CLI:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/uninstall.sh | bash -s -- --deps
+```
 
 ## What gets installed
 
@@ -104,6 +120,8 @@ Diagnostics are logged to `~/.local/share/remove-ai-watermarks-kde/raiw.log`.
 
 - `install.sh` — main installer: detects environment, dispatches per manager
 - `uninstall.sh` — main uninstaller: removes all integrations
+- `install-deps.sh` — installs the `remove-ai-watermarks` CLI and its deps
+- `uninstall-deps.sh` — removes the `remove-ai-watermarks` CLI
 - `install-<fm>.sh` / `uninstall-<fm>.sh` — per-file-manager installers/uninstallers
 - `raiw-helper.sh` — shared helper executed by the menus
 - `agents.md` + `.agents/` — documentation for AI agents working on this project

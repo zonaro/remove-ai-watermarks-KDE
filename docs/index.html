@@ -174,16 +174,16 @@
     <section class="section" id="install">
       <div class="container">
         <h2 class="section-title" data-i18n="install.title">Instalação</h2>
-        <p class="section-subtitle" data-i18n-html="install.subtitle">Primeiro instale o CLI <code>remove-ai-watermarks</code>, depois rode o instalador.</p>
+        <p class="section-subtitle" data-i18n-html="install.subtitle">O instalador instala o CLI <code>remove-ai-watermarks</code> automaticamente se necessário.</p>
 
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-body">
-            <h3 data-i18n="install.step1.title">Instale o CLI</h3>
-            <p data-i18n-html="install.step1.desc">O projeto é um front-end para o <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a> — ele precisa estar no seu <code>PATH</code>.</p>
+            <h3 data-i18n="install.step1.title">Instale o CLI (opcional)</h3>
+            <p data-i18n-html="install.step1.desc">O instalador instala automaticamente. Para instalar manualmente:</p>
             <div class="code-block">
-              <button class="copy-btn" data-copy="uv tool install --force &quot;remove-ai-watermarks[visible]&quot;" aria-label="Copiar" data-i18n="copy.copy" data-i18n-aria="copy.copy">Copiar</button>
-              <pre><code>uv tool install --force "remove-ai-watermarks[visible]"</code></pre>
+              <button class="copy-btn" data-copy="uv tool install --force --python 3.12 &quot;remove-ai-watermarks[all]&quot;" aria-label="Copiar" data-i18n="copy.copy" data-i18n-aria="copy.copy">Copiar</button>
+              <pre><code>uv tool install --force --python 3.12 "remove-ai-watermarks[all]"</code></pre>
             </div>
           </div>
         </div>
@@ -270,7 +270,7 @@ caja -q              # MATE</code></pre>
           <button class="copy-btn" data-copy="curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/uninstall.sh | bash" aria-label="Copiar" data-i18n="copy.copy" data-i18n-aria="copy.copy">Copiar</button>
           <pre><code>curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/uninstall.sh | bash</code></pre>
         </div>
-        <p class="step-note" data-i18n-html="uninstall.note">A desinstalação <strong>não</strong> remove o CLI <code>remove-ai-watermarks</code> nem os arquivos <code>_ai_cleaned</code> que você gerou.</p>
+        <p class="step-note" data-i18n-html="uninstall.note">A desinstalação <strong>não</strong> remove o CLI <code>remove-ai-watermarks</code> nem os arquivos <code>_ai_cleaned</code> que você gerou. Para remover também o CLI, use <code>--deps</code>.</p>
       </div>
     </section>
   </main>

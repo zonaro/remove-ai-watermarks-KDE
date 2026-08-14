@@ -6,6 +6,8 @@
 remove-ai-watermarks-contextmenu/
 ├── install.sh              # Main installer (dispatcher): detects DE + FMs, dispatches
 ├── uninstall.sh            # Main uninstaller (dispatcher): removes all integrations
+├── install-deps.sh         # Installs the remove-ai-watermarks CLI + deps (distro-aware)
+├── uninstall-deps.sh       # Removes the remove-ai-watermarks CLI
 ├── raiw-helper.sh          # Shared helper executed by the menus (single source of truth)
 ├── install-dolphin.sh      # KDE ServiceMenus installer
 ├── uninstall-dolphin.sh
@@ -33,12 +35,15 @@ install.sh
   │    └─ if empty → de_default_fm()          # KDE→dolphin, GNOME→nautilus, XFCE→thunar,
   │                                           #   *Cinnamon*→nemo, MATE→caja, LXDE/LXQt→pcmanfm
   ├─ --all flag → FMS=(all supported)
+  ├─ deps (unless --no-deps): curl install-deps.sh | bash
+  │    └─ uv (distro pkg → official) → python 3.12 → uv tool install remove-ai-watermarks[all]
   ├─ install shared helper (curl raiw-helper.sh → $APP_DIR, chmod +x)
   └─ for each fm: curl -fsSL $BASE_URL/install-<fm>.sh | bash
 ```
 
 `uninstall.sh` calls every `uninstall-<fm>.sh` unconditionally (idempotent),
-then removes `$APP_DIR`.
+then removes `$APP_DIR`, then (with `--deps` or after a prompt) calls
+`uninstall-deps.sh` to remove the CLI.
 
 `BASE_URL="${RAIW_BASE_URL:-https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main}"`
 — `RAIW_BASE_URL` can be overridden for local testing (e.g. `file://$PWD`).

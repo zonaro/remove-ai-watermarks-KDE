@@ -6,12 +6,15 @@
 #   1. Detecta o ambiente desktop (KDE, GNOME, XFCE, Cinnamon, MATE, LXDE/LXQt)
 #   2. Detecta os gerenciadores de arquivos instalados (dolphin, nautilus,
 #      thunar, nemo, caja, pcmanfm) — instala em TODOS os encontrados
-#   3. Instala o script auxiliar compartilhado (raiw-helper.sh)
-#   4. Chama via curl o instalador específico de cada gerenciador
+#   3. Instala a dependência remove-ai-watermarks (CLI) se não estiver no PATH
+#   4. Instala o script auxiliar compartilhado (raiw-helper.sh)
+#   5. Chama via curl o instalador específico de cada gerenciador
 #
 # Uso:
 #   curl -fsSL <raw>/install.sh | bash
-#   curl -fsSL <raw>/install.sh | bash -s -- --all   # força todos os FMs
+#   curl -fsSL <raw>/install.sh | bash -s -- --all        # força todos os FMs
+#   curl -fsSL <raw>/install.sh | bash -s -- --no-deps    # pula a dependência
+#   curl -fsSL <raw>/install.sh | bash -s -- --force-deps # reinstala a dependência
 #
 # Para testes locais, defina RAIW_BASE_URL (ex: file:///caminho/do/repo).
 # =============================================================================
@@ -57,7 +60,15 @@ de_default_fm() {
 }
 
 ALL=0
-[ "${1:-}" = "--all" ] && ALL=1
+DEPS=1
+FORCE_DEPS=0
+for arg in "$@"; do
+    case "$arg" in
+        --all)        ALL=1 ;;
+        --no-deps)    DEPS=0 ;;
+        --force-deps) FORCE_DEPS=1 ;;
+    esac
+done
 
 FMS=()
 if [ "$ALL" -eq 1 ]; then
@@ -86,6 +97,23 @@ if [ "${#FMS[@]}" -eq 0 ]; then
 fi
 
 echo "==> Gerenciadores alvo: ${FMS[*]}"
+
+# ---------------------------------------------------------------------------
+# Dependência: remove-ai-watermarks (CLI)
+# ---------------------------------------------------------------------------
+if [ "$DEPS" -eq 1 ]; then
+    echo
+    echo "============================================================"
+    echo " Dependência: remove-ai-watermarks"
+    echo "============================================================"
+    if [ "$FORCE_DEPS" -eq 1 ]; then
+        curl -fsSL "$BASE_URL/install-deps.sh" | bash -s -- --force
+    else
+        curl -fsSL "$BASE_URL/install-deps.sh" | bash
+    fi
+else
+    echo "==> Dependência ignorada (--no-deps)."
+fi
 
 # ---------------------------------------------------------------------------
 # Script auxiliar compartilhado (instalado uma única vez)

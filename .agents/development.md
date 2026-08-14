@@ -17,10 +17,14 @@
 
 ```bash
 # 1. Syntax
-bash -n install.sh uninstall.sh raiw-helper.sh install-*.sh uninstall-*.sh
+bash -n install.sh uninstall.sh raiw-helper.sh install-deps.sh uninstall-deps.sh install-*.sh uninstall-*.sh
 
 # 2. Install all managers locally (RAIW_BASE_URL points at the repo)
-RAIW_BASE_URL="file://$PWD" ./install.sh --all
+RAIW_BASE_URL="file://$PWD" ./install.sh --all --no-deps   # skip the CLI dependency
+
+# 2b. Dependency installer (needs uv on PATH)
+./install-deps.sh --force                                   # reinstall the CLI
+RAIW_BASE_URL="file://$PWD" ./uninstall.sh --deps           # also remove the CLI
 
 # 3. Verify installed files
 ls -l ~/.local/share/kio/servicemenus/remove-ai-watermarks*.desktop
