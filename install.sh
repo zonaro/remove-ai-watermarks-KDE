@@ -50,6 +50,10 @@ shift 2>/dev/null || true
 
 RAIW="$(command -v remove-ai-watermarks || true)"
 
+# Log de diagnóstico — nunca falhar em silêncio
+LOG="$(dirname "$0")/raiw.log"
+log() { printf '%s %s\n' "$(date '+%F %T')" "$*" >> "$LOG" 2>/dev/null || true; }
+
 # --- Localização (detecta o idioma do sistema via $LANG) ---------------------
 case "${LANG:-}" in
     pt*)
@@ -61,9 +65,10 @@ case "${LANG:-}" in
         L_MISSING="Não encontrado: %s"
         L_DONE="%s arquivo(s) processado(s) com sucesso."
         L_FAIL="%s arquivo(s) falharam (%s processado(s)). Veja o terminal para detalhes."
-        L_IDENT_FOUND="Marca(s) ou metadado(s) de IA encontrado(s) em %s:"
-        L_IDENT_CLEAN="Nenhuma marca ou metadado de IA encontrado em %s."
         L_IDENT_FAIL="Falha ao analisar %s"
+        L_IDENT_WORKING="Analisando %s... aguarde"
+        L_TXT_HEADER="======= Remove AI Watermarks - Análise de IA ======="
+        L_TXT_FILE=">>> Arquivo:"
         ;;
     es*)
         L_ERR="Remove AI Watermarks - ERROR"
@@ -74,9 +79,10 @@ case "${LANG:-}" in
         L_MISSING="No encontrado: %s"
         L_DONE="%s archivo(s) procesado(s) correctamente."
         L_FAIL="%s archivo(s) fallaron (%s procesado(s)). Vea la terminal para más detalles."
-        L_IDENT_FOUND="Marca(s) o metadato(s) de IA encontrado(s) en %s:"
-        L_IDENT_CLEAN="No se encontraron marcas ni metadatos de IA en %s."
         L_IDENT_FAIL="Error al analizar %s"
+        L_IDENT_WORKING="Analizando %s... espere"
+        L_TXT_HEADER="======= Remove AI Watermarks - Análisis de IA ======="
+        L_TXT_FILE=">>> Archivo:"
         ;;
     *)
         L_ERR="Remove AI Watermarks - ERROR"
@@ -87,46 +93,81 @@ case "${LANG:-}" in
         L_MISSING="Not found: %s"
         L_DONE="%s file(s) processed successfully."
         L_FAIL="%s file(s) failed (%s processed). See terminal for details."
-        L_IDENT_FOUND="AI mark(s) or metadata found in %s:"
-        L_IDENT_CLEAN="No AI mark or metadata found in %s."
         L_IDENT_FAIL="Failed to analyze %s"
+        L_IDENT_WORKING="Analyzing %s... please wait"
+        L_TXT_HEADER="======= Remove AI Watermarks - AI Analysis ======="
+        L_TXT_FILE=">>> File:"
         ;;
 esac
 
 notify() { # $1=título $2=mensagem
     if command -v kdialog >/dev/null 2>&1; then
-        kdialog --title "$1" --passivepopup "$2" 5 >/dev/null 2>&1 || true
+        kdialog --title "$1" --passivepopup "$2" 5 >/dev/null 2>&1 || log "kdialog passivepopup falhou"
+    else
+        log "kdialog nao encontrado; popup suprimido"
     fi
 }
 notify_err()  { notify "$L_ERR" "$1"; }
 notify_done() { notify "Remove AI Watermarks" "$1"; }
 
-show_dialog() { # $1=tipo (sorry|msgbox) $2=texto — exibe diálogo kdialog (ou stdout sem kdialog)
-    if command -v kdialog >/dev/null 2>&1; then
-        kdialog --title "Remove AI Watermarks - Identify" "$1" "$2" >/dev/null 2>&1 || true
-    else
-        printf '%s\n' "$2" >&2
-    fi
+# <arquivo> -> <dir>/<stem>_ai_analysis.txt
+out_txt_name() {
+    local f="$1" dir base stem
+    dir="$(dirname "$f")"
+    base="$(basename "$f")"
+    if [[ "$base" == *.* ]]; then stem="${base%.*}"; else stem="$base"; fi
+    printf '%s/%s_ai_analysis.txt\n' "$dir" "$stem"
 }
 
-# Analisa a imagem e exibe o resultado em um diálogo:
-#   - ícone de ALERTA (--sorry) se encontrou marcas/metadados de IA
-#   - ícone de SUCESSO (--msgbox) se não encontrou nada
+# Abre um arquivo com o visualizador padrão do sistema
+open_file() { # $1=arquivo
+    if command -v xdg-open >/dev/null 2>&1; then
+        xdg-open "$1" >/dev/null 2>&1 &
+        return 0
+    fi
+    for o in kde-open6 kde-open5 kde-open; do
+        if command -v "$o" >/dev/null 2>&1; then
+            "$o" "$1" >/dev/null 2>&1 &
+            return 0
+        fi
+    done
+    for o in kioclient6 kioclient5 kioclient; do
+        if command -v "$o" >/dev/null 2>&1; then
+            "$o" open "$1" >/dev/null 2>&1 &
+            return 0
+        fi
+    done
+    log "nenhum abridor encontrado; análise salva em $1"
+    return 1
+}
+
+# TXT acumulado da análise (modo identify)
+IDENT_TXT=""
+IDENT_COUNT=0
+
+# Analisa a imagem e anexa o resultado ao TXT (aberto ao final).
 identify_one() { # $1=arquivo
-    local f="$1" out rc summary
+    local f="$1" out rc
+    log "identify iniciado: $f"
+    notify "Remove AI Watermarks - Identify" "$(printf "$L_IDENT_WORKING" "$(basename "$f")")"
+    if [ -z "$IDENT_TXT" ]; then
+        IDENT_TXT="$(out_txt_name "$f")"
+        printf '%s\n%s\n\n' "$L_TXT_HEADER" "Data: $(date '+%Y-%m-%d %H:%M:%S')" > "$IDENT_TXT"
+    fi
     out="$("$RAIW" identify "$f" 2>&1)"
     rc=$?
     if [ "$rc" -ne 0 ]; then
+        log "identify falhou (rc=$rc): $f"
         notify_err "$(printf "$L_IDENT_FAIL" "$(basename "$f")")"
         return "$rc"
     fi
-    # resumo: da linha "Verdict:" até antes de "Caveats:"
-    summary="$(printf '%s\n' "$out" | awk '/Caveats:/{exit} /Verdict:/{p=1} p')"
-    if printf '%s\n' "$out" | grep -qE "Verdict: AI|Watermarks / provenance markers|Integrity clash"; then
-        show_dialog sorry "$(printf "$L_IDENT_FOUND" "$(basename "$f")")\n\n$summary"
-    else
-        show_dialog msgbox "$(printf "$L_IDENT_CLEAN" "$(basename "$f")")\n\n$summary"
-    fi
+    {
+        printf '%s %s\n' "$L_TXT_FILE" "$f"
+        printf '%s\n' "$out"
+        printf '%s\n' ''
+    } >> "$IDENT_TXT"
+    IDENT_COUNT=$((IDENT_COUNT + 1))
+    log "identify concluído: $f (txt=$IDENT_TXT)"
 }
 
 is_image() {
@@ -206,7 +247,12 @@ for target in "$@"; do
     fi
 done
 
-if [ "$MODE" != identify ]; then
+if [ "$MODE" = identify ]; then
+    if [ "$IDENT_COUNT" -gt 0 ]; then
+        log "identify: abrindo $IDENT_TXT"
+        open_file "$IDENT_TXT"
+    fi
+else
     if [ "$errors" -eq 0 ]; then
         notify_done "$(printf "$L_DONE" "$processed")"
     else
