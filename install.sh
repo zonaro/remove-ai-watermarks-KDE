@@ -1,391 +1,122 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Instala o menu de contexto "Remove AI Watermarks" no Dolphin/Konqueror (KDE).
+# Instalador principal "Remove AI Watermarks" — multi-desktop.
 #
-# O que este script faz:
-#   1. Copia um script auxiliar para ~/.local/share/remove-ai-watermarks-kde/
-#   2. Cria os ServiceMenus (.desktop) em ~/.local/share/kio/servicemenus/
-#   3. Atualiza o cache do KDE (kbuildsycoca6)
+# Este script é o ponto de entrada. Ele:
+#   1. Detecta o ambiente desktop (KDE, GNOME, XFCE, Cinnamon, MATE, LXDE/LXQt)
+#   2. Detecta os gerenciadores de arquivos instalados (dolphin, nautilus,
+#      thunar, nemo, caja, pcmanfm) — instala em TODOS os encontrados
+#   3. Instala o script auxiliar compartilhado (raiw-helper.sh)
+#   4. Chama via curl o instalador específico de cada gerenciador
 #
-# O menu aparece ao clicar com o botão direito em imagens, pastas ou
-# seleção múltipla de imagens, com as opções:
-#   - Identificar (identify)
-#   - Remover marca visível (visible)
-#   - Remover metadados AI (metadata --remove)
-#   - Remover tudo (all)
-#   - Processar em lote (visible)  <- apenas em pastas / múltiplas imagens
+# Uso:
+#   curl -fsSL <raw>/install.sh | bash
+#   curl -fsSL <raw>/install.sh | bash -s -- --all   # força todos os FMs
 #
-# O arquivo de saída sempre será: <nome_original>_ai_cleaned.<ext>
+# Para testes locais, defina RAIW_BASE_URL (ex: file:///caminho/do/repo).
 # =============================================================================
 set -euo pipefail
 
+BASE_URL="${RAIW_BASE_URL:-https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main}"
 DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}"
-MENU_DIR="$DATA_DIR/kio/servicemenus"
 APP_DIR="$DATA_DIR/remove-ai-watermarks-kde"
 HELPER="$APP_DIR/raiw-helper.sh"
 
-echo "==> Verificando o comando remove-ai-watermarks..."
-if command -v remove-ai-watermarks >/dev/null 2>&1; then
-    echo "    encontrado: $(remove-ai-watermarks --version 2>&1 | head -1)"
-else
-    echo "    AVISO: 'remove-ai-watermarks' não está no PATH."
-    echo "    O menu será instalado, mas as ações falharão até o comando ser instalado."
-fi
-
-mkdir -p "$MENU_DIR" "$APP_DIR"
-
 # ---------------------------------------------------------------------------
-# Script auxiliar (executa o remove-ai-watermarks e nomeia a saída _ai_cleaned)
+# Detecção de ambiente e gerenciadores
 # ---------------------------------------------------------------------------
-cat > "$HELPER" <<'HELPER_EOF'
-#!/usr/bin/env bash
-# raiw-helper.sh — processa arquivos/pastas chamando o remove-ai-watermarks.
-# Uso: raiw-helper.sh <identify|visible|metadata|all|batch> <arquivo|pasta>...
-# Saída sempre nomeada: <nome>_ai_cleaned.<ext> (no mesmo diretório do original)
-# Mensagens localizadas conforme o idioma do sistema (pt / es / en).
-set -u
+DE="${XDG_CURRENT_DESKTOP:-}"
+echo "==> Ambiente detectado: ${DE:-desconhecido}"
 
-MODE="${1:-}"
-shift 2>/dev/null || true
-
-RAIW="$(command -v remove-ai-watermarks || true)"
-
-# Log de diagnóstico — nunca falhar em silêncio
-LOG="$(dirname "$0")/raiw.log"
-log() { printf '%s %s\n' "$(date '+%F %T')" "$*" >> "$LOG" 2>/dev/null || true; }
-
-# --- Localização (detecta o idioma do sistema via $LANG) ---------------------
-case "${LANG:-}" in
-    pt*)
-        L_ERR="Remove AI Watermarks - ERRO"
-        L_MODE="Modo não informado"
-        L_NOTFOUND="remove-ai-watermarks não encontrado no PATH"
-        L_NOFILE="Nenhum arquivo selecionado"
-        L_FOLDER="Pasta selecionada: use a opção 'Processar em lote'"
-        L_MISSING="Não encontrado: %s"
-        L_DONE="%s arquivo(s) processado(s) com sucesso."
-        L_FAIL="%s arquivo(s) falharam (%s processado(s)). Veja o terminal para detalhes."
-        L_IDENT_FAIL="Falha ao analisar %s"
-        L_IDENT_WORKING="Analisando %s... aguarde"
-        L_TXT_HEADER="======= Remove AI Watermarks - Análise de IA ======="
-        L_TXT_FILE=">>> Arquivo:"
-        ;;
-    es*)
-        L_ERR="Remove AI Watermarks - ERROR"
-        L_MODE="Modo no especificado"
-        L_NOTFOUND="remove-ai-watermarks no encontrado en el PATH"
-        L_NOFILE="Ningún archivo seleccionado"
-        L_FOLDER="Carpeta seleccionada: use la opción 'Procesar por lotes'"
-        L_MISSING="No encontrado: %s"
-        L_DONE="%s archivo(s) procesado(s) correctamente."
-        L_FAIL="%s archivo(s) fallaron (%s procesado(s)). Vea la terminal para más detalles."
-        L_IDENT_FAIL="Error al analizar %s"
-        L_IDENT_WORKING="Analizando %s... espere"
-        L_TXT_HEADER="======= Remove AI Watermarks - Análisis de IA ======="
-        L_TXT_FILE=">>> Archivo:"
-        ;;
-    *)
-        L_ERR="Remove AI Watermarks - ERROR"
-        L_MODE="Mode not specified"
-        L_NOTFOUND="remove-ai-watermarks not found in PATH"
-        L_NOFILE="No file selected"
-        L_FOLDER="Folder selected: use the 'Batch process' option"
-        L_MISSING="Not found: %s"
-        L_DONE="%s file(s) processed successfully."
-        L_FAIL="%s file(s) failed (%s processed). See terminal for details."
-        L_IDENT_FAIL="Failed to analyze %s"
-        L_IDENT_WORKING="Analyzing %s... please wait"
-        L_TXT_HEADER="======= Remove AI Watermarks - AI Analysis ======="
-        L_TXT_FILE=">>> File:"
-        ;;
-esac
-
-notify() { # $1=título $2=mensagem
-    if command -v kdialog >/dev/null 2>&1; then
-        kdialog --title "$1" --passivepopup "$2" 5 >/dev/null 2>&1 || log "kdialog passivepopup falhou"
-    else
-        log "kdialog nao encontrado; popup suprimido"
-    fi
-}
-notify_err()  { notify "$L_ERR" "$1"; }
-notify_done() { notify "Remove AI Watermarks" "$1"; }
-
-# <arquivo> -> <dir>/<stem>_ai_analysis.txt
-out_txt_name() {
-    local f="$1" dir base stem
-    dir="$(dirname "$f")"
-    base="$(basename "$f")"
-    if [[ "$base" == *.* ]]; then stem="${base%.*}"; else stem="$base"; fi
-    printf '%s/%s_ai_analysis.txt\n' "$dir" "$stem"
-}
-
-# Abre um arquivo com o visualizador padrão do sistema
-open_file() { # $1=arquivo
-    if command -v xdg-open >/dev/null 2>&1; then
-        xdg-open "$1" >/dev/null 2>&1 &
-        return 0
-    fi
-    for o in kde-open6 kde-open5 kde-open; do
-        if command -v "$o" >/dev/null 2>&1; then
-            "$o" "$1" >/dev/null 2>&1 &
-            return 0
-        fi
-    done
-    for o in kioclient6 kioclient5 kioclient; do
-        if command -v "$o" >/dev/null 2>&1; then
-            "$o" open "$1" >/dev/null 2>&1 &
-            return 0
-        fi
-    done
-    log "nenhum abridor encontrado; análise salva em $1"
-    return 1
-}
-
-# TXT acumulado da análise (modo identify)
-IDENT_TXT=""
-IDENT_COUNT=0
-
-# Analisa a imagem e anexa o resultado ao TXT (aberto ao final).
-identify_one() { # $1=arquivo
-    local f="$1" out rc
-    log "identify iniciado: $f"
-    notify "Remove AI Watermarks - Identify" "$(printf "$L_IDENT_WORKING" "$(basename "$f")")"
-    if [ -z "$IDENT_TXT" ]; then
-        IDENT_TXT="$(out_txt_name "$f")"
-        printf '%s\n%s\n\n' "$L_TXT_HEADER" "Data: $(date '+%Y-%m-%d %H:%M:%S')" > "$IDENT_TXT"
-    fi
-    out="$("$RAIW" identify "$f" 2>&1)"
-    rc=$?
-    if [ "$rc" -ne 0 ]; then
-        log "identify falhou (rc=$rc): $f"
-        notify_err "$(printf "$L_IDENT_FAIL" "$(basename "$f")")"
-        return "$rc"
-    fi
-    {
-        printf '%s %s\n' "$L_TXT_FILE" "$f"
-        printf '%s\n' "$out"
-        printf '%s\n' ''
-    } >> "$IDENT_TXT"
-    IDENT_COUNT=$((IDENT_COUNT + 1))
-    log "identify concluído: $f (txt=$IDENT_TXT)"
-}
-
-is_image() {
+# Mapeia um gerenciador para o nome do script de instalação
+fm_script() {
     case "$1" in
-        *.jpg|*.jpeg|*.png|*.webp|*.bmp|*.tif|*.tiff|*.JPG|*.JPEG|*.PNG|*.WEBP|*.BMP|*.TIF|*.TIFF) return 0 ;;
-    esac
-    return 1
-}
-
-# <arquivo> -> <dir>/<nome>_ai_cleaned.<ext>
-out_name() {
-    local f="$1" dir base ext stem
-    dir="$(dirname "$f")"
-    base="$(basename "$f")"
-    if [[ "$base" == *.* ]]; then
-        ext="${base##*.}"
-        stem="${base%.*}"
-        printf '%s/%s_ai_cleaned.%s\n' "$dir" "$stem" "$ext"
-    else
-        printf '%s/%s_ai_cleaned\n' "$dir" "$base"
-    fi
-}
-
-# $1=modo  $2=arquivo
-process_one() {
-    local mode="$1" f="$2" out
-    case "$mode" in
-        identify)
-            identify_one "$f"
-            ;;
-        visible|metadata|all)
-            out="$(out_name "$f")"
-            "$RAIW" "$mode" "$f" -o "$out"
-            ;;
-        *)
-            return 2
-            ;;
+        dolphin)     echo "dolphin" ;;
+        nautilus)    echo "nautilus" ;;
+        thunar)      echo "thunar" ;;
+        nemo)        echo "nemo" ;;
+        caja)        echo "caja" ;;
+        pcmanfm|pcmanfm-qt) echo "pcmanfm" ;;
+        *)           return 1 ;;
     esac
 }
 
-# Processa todas as imagens (nível 1) da pasta no modo visible.
-# Pula arquivos que já são saídas nossas (*_ai_cleaned.*).
-batch_dir() {
-    local dir="$1" f
-    while IFS= read -r -d '' f; do
-        is_image "$f" || continue
-        case "$(basename "$f")" in *_ai_cleaned.*) continue ;; esac
-        process_one visible "$f"
-    done < <(find "$dir" -maxdepth 1 -type f -print0 2>/dev/null)
+# Fallback: ambiente → gerenciador padrão (quando nada está no PATH)
+# Usa correspondência por conteúdo: $XDG_CURRENT_DESKTOP pode ser uma lista
+# separada por ':' (ex: "ubuntu:GNOME") ou variar por distro ("plasma").
+de_default_fm() {
+    case "${DE:-}" in
+        *KDE*|*plasma*)  echo "dolphin" ;;
+        *GNOME*)         echo "nautilus" ;;
+        *XFCE*)          echo "thunar" ;;
+        *Cinnamon*)      echo "nemo" ;;
+        *MATE*)          echo "caja" ;;
+        *LXDE*|*LXQt*)   echo "pcmanfm" ;;
+        *)               return 1 ;;
+    esac
 }
 
-[ -n "$MODE" ]          || { notify_err "$L_MODE"; exit 2; }
-[ -n "$RAIW" ]          || { notify_err "$L_NOTFOUND"; exit 1; }
-[ "$#" -ge 1 ]          || { notify_err "$L_NOFILE"; exit 2; }
+ALL=0
+[ "${1:-}" = "--all" ] && ALL=1
 
-processed=0
-errors=0
-
-for target in "$@"; do
-    if [ -d "$target" ]; then
-        if [ "$MODE" = batch ]; then
-            batch_dir "$target"
-        else
-            notify_err "$L_FOLDER"
-            errors=$((errors + 1))
-        fi
-    elif [ -f "$target" ]; then
-        if [ "$MODE" = batch ]; then
-            process_one visible "$target" || errors=$((errors + 1))
-        else
-            process_one "$MODE" "$target" || errors=$((errors + 1))
-        fi
-        processed=$((processed + 1))
-    else
-        notify_err "$(printf "$L_MISSING" "$target")"
-        errors=$((errors + 1))
-    fi
-done
-
-if [ "$MODE" = identify ]; then
-    if [ "$IDENT_COUNT" -gt 0 ]; then
-        log "identify: abrindo $IDENT_TXT"
-        open_file "$IDENT_TXT"
-    fi
+FMS=()
+if [ "$ALL" -eq 1 ]; then
+    echo "==> Modo --all: instalando em todos os gerenciadores suportados."
+    FMS=(dolphin nautilus thunar nemo caja pcmanfm)
 else
-    if [ "$errors" -eq 0 ]; then
-        notify_done "$(printf "$L_DONE" "$processed")"
-    else
-        notify_err "$(printf "$L_FAIL" "$errors" "$processed")"
+    for fm in dolphin nautilus thunar nemo caja pcmanfm pcmanfm-qt; do
+        if command -v "$fm" >/dev/null 2>&1; then
+            FMS+=("$fm")
+        fi
+    done
+    if [ "${#FMS[@]}" -eq 0 ]; then
+        if def="$(de_default_fm)"; then
+            echo "    Nenhum gerenciador no PATH; usando o padrão do ambiente: $def"
+            FMS=("$def")
+        fi
     fi
 fi
-exit 0
-HELPER_EOF
 
+if [ "${#FMS[@]}" -eq 0 ]; then
+    echo
+    echo "Nenhum gerenciador de arquivos suportado foi encontrado."
+    echo "Suportados: dolphin, nautilus, thunar, nemo, caja, pcmanfm."
+    echo "Use '--all' para instalar em todos mesmo assim."
+    exit 0
+fi
+
+echo "==> Gerenciadores alvo: ${FMS[*]}"
+
+# ---------------------------------------------------------------------------
+# Script auxiliar compartilhado (instalado uma única vez)
+# ---------------------------------------------------------------------------
+mkdir -p "$APP_DIR"
+echo "==> Atualizando o script auxiliar..."
+if ! curl -fsSL "$BASE_URL/raiw-helper.sh" -o "$HELPER"; then
+    if [ -f "$HELPER" ]; then
+        echo "    AVISO: falha ao baixar; mantendo o helper existente."
+    else
+        echo "    ERRO: não foi possível baixar o raiw-helper.sh de $BASE_URL"
+        exit 1
+    fi
+fi
 chmod +x "$HELPER"
 
 # ---------------------------------------------------------------------------
-# ServiceMenu para imagens (image/*)
+# Instalação por gerenciador (via curl, no momento certo)
 # ---------------------------------------------------------------------------
-cat > "$MENU_DIR/remove-ai-watermarks.desktop" <<EOF
-[Desktop Entry]
-Type=Service
-Name=Remove AI Watermarks
-ServiceTypes=KFileItemActions/Plugin;KonqPopupMenu/Plugin;
-MimeType=image/*;
-Actions=identify;visible;metadata;all;
-X-KDE-Submenu=Remove AI Watermarks
-X-KDE-Priority=TopLevel
-
-[Desktop Action identify]
-Name=Identify (identify)
-Name[pt]=Identificar (identify)
-Name[es]=Identificar (identify)
-Icon=search
-Exec="$HELPER" identify %F
-
-[Desktop Action visible]
-Name=Remove visible mark (visible)
-Name[pt]=Remover marca visível (visible)
-Name[es]=Eliminar marca visible (visible)
-Icon=draw-eraser
-Exec="$HELPER" visible %F
-
-[Desktop Action metadata]
-Name=Remove AI metadata (metadata)
-Name[pt]=Remover metadados AI (metadata)
-Name[es]=Eliminar metadatos IA (metadata)
-Icon=edit-delete
-Exec="$HELPER" metadata %F
-
-[Desktop Action all]
-Name=Remove everything (all)
-Name[pt]=Remover tudo (all)
-Name[es]=Eliminar todo (all)
-Icon=edit-clear
-Exec="$HELPER" all %F
-EOF
-
-# ---------------------------------------------------------------------------
-# ServiceMenu para lote em múltiplas imagens (image/*, 2+ selecionadas)
-# ---------------------------------------------------------------------------
-cat > "$MENU_DIR/remove-ai-watermarks-batch.desktop" <<EOF
-[Desktop Entry]
-Type=Service
-Name=Remove AI Watermarks (batch)
-Name[pt]=Remove AI Watermarks (lote)
-Name[es]=Remove AI Watermarks (lote)
-ServiceTypes=KFileItemActions/Plugin;KonqPopupMenu/Plugin;
-MimeType=image/*;
-Actions=batch;
-X-KDE-Submenu=Remove AI Watermarks
-X-KDE-Priority=TopLevel
-X-KDE-MinNumberOfUrls=2
-
-[Desktop Action batch]
-Name=Batch process (visible)
-Name[pt]=Processar em lote (visible)
-Name[es]=Procesar por lotes (visible)
-Icon=view-refresh
-Exec="$HELPER" batch %F
-EOF
-
-# ---------------------------------------------------------------------------
-# ServiceMenu para pastas (inode/directory) — apenas lote
-# ---------------------------------------------------------------------------
-cat > "$MENU_DIR/remove-ai-watermarks-folders.desktop" <<EOF
-[Desktop Entry]
-Type=Service
-Name=Remove AI Watermarks (folders)
-Name[pt]=Remove AI Watermarks (pastas)
-Name[es]=Remove AI Watermarks (carpetas)
-ServiceTypes=KFileItemActions/Plugin;KonqPopupMenu/Plugin;
-MimeType=inode/directory;
-Actions=batch;
-X-KDE-Submenu=Remove AI Watermarks
-X-KDE-Priority=TopLevel
-
-[Desktop Action batch]
-Name=Batch process (visible)
-Name[pt]=Processar em lote (visible)
-Name[es]=Procesar por lotes (visible)
-Icon=view-refresh
-Exec="$HELPER" batch %F
-EOF
-
-# O KDE só autoriza executar ServiceMenus com o bit de execução
-chmod +x "$MENU_DIR"/remove-ai-watermarks*.desktop
-
-# ---------------------------------------------------------------------------
-# Atualiza o cache do KDE
-# ---------------------------------------------------------------------------
-echo "==> Atualizando o cache do KDE (kbuildsycoca)..."
-if command -v kbuildsycoca6 >/dev/null 2>&1; then
-    kbuildsycoca6 >/dev/null 2>&1 || true
-elif command -v kbuildsycoca5 >/dev/null 2>&1; then
-    kbuildsycoca5 >/dev/null 2>&1 || true
-else
-    echo "    AVISO: kbuildsycoca não encontrado; o menu pode não aparecer até o próximo login."
-fi
+for fm in "${FMS[@]}"; do
+    script="$(fm_script "$fm")" || continue
+    echo
+    echo "============================================================"
+    echo " Instalando para: $fm"
+    echo "============================================================"
+    curl -fsSL "$BASE_URL/install-$script.sh" | bash
+done
 
 echo
 echo "============================================================"
 echo " Instalação concluída!"
 echo "============================================================"
-echo " Arquivos instalados:"
-echo "   $HELPER"
-echo "   $MENU_DIR/remove-ai-watermarks.desktop"
-echo "   $MENU_DIR/remove-ai-watermarks-batch.desktop"
-echo "   $MENU_DIR/remove-ai-watermarks-folders.desktop"
-echo
-echo " Para o menu aparecer, reinicie o Dolphin:"
-echo "   killall dolphin"
-echo
-echo " O menu 'Remove AI Watermarks' estará em:"
-echo "   - Imagem única: Identificar / Remover marca visível /"
-echo "                   Remover metadados / Remover tudo"
-echo "   - Múltiplas imagens: + Processar em lote"
-echo "   - Pastas: Processar em lote"
-echo
-echo " Saída gerada: <nome>_ai_cleaned.<ext>"
+echo " Reinicie os gerenciadores para o menu aparecer."
 echo "============================================================"
