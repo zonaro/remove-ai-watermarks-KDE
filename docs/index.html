@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Remove AI Watermarks — Context Menus</title>
+  <meta name="description" content="Menus de contexto para remover marcas d'água de IA diretamente do seu gerenciador de arquivos. Suporta Dolphin, Nautilus, Thunar, Nemo, Caja e PCManFM.">
+  <meta property="og:title" content="Remove AI Watermarks — Context Menus">
+  <meta property="og:description" content="Remova marcas d'água de IA com um clique direito no seu gerenciador de arquivos.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+</head>
+<body>
+  <!-- Background decorativo -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-1" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow-2" aria-hidden="true"></div>
+
+  <!-- Navegação -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="#top" class="brand">
+        <span class="brand-icon">🛡️</span>
+        <span class="brand-text">Remove AI <strong>Watermarks</strong></span>
+      </a>
+      <nav class="nav-links" id="navLinks">
+        <a href="#features">Recursos</a>
+        <a href="#managers">Gerenciadores</a>
+        <a href="#install">Instalação</a>
+        <a href="#usage">Uso</a>
+        <a href="#uninstall">Desinstalar</a>
+      </nav>
+      <a href="https://github.com/zonaro/remove-ai-watermarks-contextmenu" class="btn btn-ghost btn-sm" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+        GitHub
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-badge">
+          <span class="pulse-dot"></span>
+          Multi-desktop · Open Source
+        </div>
+        <h1 class="hero-title">
+          Remova marcas d'água de IA<br>
+          <span class="gradient-text">com um clique direito</span>
+        </h1>
+        <p class="hero-subtitle">
+          Integra o <code>remove-ai-watermarks</code> como menu de contexto no seu
+          gerenciador de arquivos. Identifique, limpe e processe em lote imagens
+          com marcas de IA — direto do Dolphin, Nautilus, Thunar, Nemo, Caja ou PCManFM.
+        </p>
+        <div class="hero-actions">
+          <a href="#install" class="btn btn-primary">
+            Instalar agora
+            <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 1a.75.75 0 0 1 .75.75v10.19l3.22-3.22a.75.75 0 1 1 1.06 1.06l-4.5 4.5a.75.75 0 0 1-1.06 0l-4.5-4.5a.75.75 0 1 1 1.06-1.06l3.22 3.22V1.75A.75.75 0 0 1 8 1Z"/></svg>
+          </a>
+          <a href="https://github.com/zonaro/remove-ai-watermarks-contextmenu" class="btn btn-ghost" target="_blank" rel="noopener">Ver no GitHub</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><span class="stat-num">6</span><span class="stat-label">gerenciadores</span></div>
+          <div class="stat"><span class="stat-num">4</span><span class="stat-label">modos de limpeza</span></div>
+          <div class="stat"><span class="stat-num">3</span><span class="stat-label">idiomas</span></div>
+          <div class="stat"><span class="stat-num">0</span><span class="stat-label">dependências</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Recursos -->
+    <section class="section" id="features">
+      <div class="container">
+        <h2 class="section-title">Recursos</h2>
+        <p class="section-subtitle">Tudo o que você precisa para limpar imagens de IA, sem sair do seu gerenciador de arquivos.</p>
+        <div class="features-grid">
+          <article class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>Identificar</h3>
+            <p>Analisa a imagem e gera um relatório completo em <code>&lt;nome&gt;_ai_analysis.txt</code>, aberto automaticamente no seu editor.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🧹</div>
+            <h3>Remover marca visível</h3>
+            <p>Detecta e remove marcas visíveis conhecidas (Gemini, Doubao, Jimeng, Qwen, Kling e mais).</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🏷️</div>
+            <h3>Remover metadados</h3>
+            <p>Limpa metadados de IA (C2PA, EXIF, parâmetros de geração) que identificam a imagem como gerada.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Remover tudo</h3>
+            <p>Pipeline completo: marca visível + metadados + marca invisível, em uma única operação.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">📁</div>
+            <h3>Processar em lote</h3>
+            <p>Selecione uma pasta ou várias imagens e limpe todas de uma vez. Pula automaticamente arquivos já limpos.</p>
+          </article>
+          <article class="feature-card">
+            <div class="feature-icon">🌍</div>
+            <h3>Multi-desktop</h3>
+            <p>Funciona em KDE, GNOME, XFCE, Cinnamon, MATE, LXDE e LXQt. O instalador detecta tudo sozinho.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gerenciadores -->
+    <section class="section section-alt" id="managers">
+      <div class="container">
+        <h2 class="section-title">Gerenciadores suportados</h2>
+        <p class="section-subtitle">O instalador detecta seu ambiente e instala em todos os gerenciadores compatíveis encontrados.</p>
+        <div class="managers-grid">
+          <div class="manager-card">
+            <div class="manager-logo kde">🦉</div>
+            <h3>Dolphin</h3>
+            <span class="manager-de">KDE Plasma</span>
+            <span class="manager-mech">ServiceMenus</span>
+          </div>
+          <div class="manager-card">
+            <div class="manager-logo gnome">🐚</div>
+            <h3>Nautilus</h3>
+            <span class="manager-de">GNOME</span>
+            <span class="manager-mech">Scripts</span>
+          </div>
+          <div class="manager-card">
+            <div class="manager-logo xfce">🐭</div>
+            <h3>Thunar</h3>
+            <span class="manager-de">XFCE</span>
+            <span class="manager-mech">Custom actions</span>
+          </div>
+          <div class="manager-card">
+            <div class="manager-logo cinnamon">🍂</div>
+            <h3>Nemo</h3>
+            <span class="manager-de">Cinnamon</span>
+            <span class="manager-mech">Nemo actions</span>
+          </div>
+          <div class="manager-card">
+            <div class="manager-logo mate">🧉</div>
+            <h3>Caja</h3>
+            <span class="manager-de">MATE</span>
+            <span class="manager-mech">Scripts</span>
+          </div>
+          <div class="manager-card">
+            <div class="manager-logo lxqt">🖥️</div>
+            <h3>PCManFM</h3>
+            <span class="manager-de">LXDE / LXQt</span>
+            <span class="manager-mech">DES-EMA</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Instalação -->
+    <section class="section" id="install">
+      <div class="container">
+        <h2 class="section-title">Instalação</h2>
+        <p class="section-subtitle">Primeiro instale o CLI <code>remove-ai-watermarks</code>, depois rode o instalador.</p>
+
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h3>Instale o CLI</h3>
+            <p>O projeto é um front-end para o <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a> — ele precisa estar no seu <code>PATH</code>.</p>
+            <div class="code-block">
+              <button class="copy-btn" data-copy="uv tool install --force &quot;remove-ai-watermarks[visible]&quot;" aria-label="Copiar">Copiar</button>
+              <pre><code>uv tool install --force "remove-ai-watermarks[visible]"</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h3>Instale os menus de contexto</h3>
+            <p>O instalador detecta seu ambiente e instala em todos os gerenciadores compatíveis.</p>
+            <div class="code-block">
+              <button class="copy-btn" data-copy="curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash" aria-label="Copiar">Copiar</button>
+              <pre><code>curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash</code></pre>
+            </div>
+            <p class="step-note">Para instalar em <strong>todos</strong> os gerenciadores suportados, mesmo os não detectados:</p>
+            <div class="code-block">
+              <button class="copy-btn" data-copy="curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash -s -- --all" aria-label="Copiar">Copiar</button>
+              <pre><code>curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash -s -- --all</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h3>Reinicie o gerenciador</h3>
+            <p>Para o menu aparecer, reinicie o gerenciador de arquivos uma vez.</p>
+            <div class="code-block">
+              <button class="copy-btn" data-copy="killall dolphin      # KDE
+nautilus -q          # GNOME
+thunar -q            # XFCE (ou faça logout/login)
+nemo -q              # Cinnamon
+caja -q              # MATE" aria-label="Copiar">Copiar</button>
+              <pre><code>killall dolphin      # KDE
+nautilus -q          # GNOME
+thunar -q            # XFCE (ou faça logout/login)
+nemo -q              # Cinnamon
+caja -q              # MATE</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Uso -->
+    <section class="section section-alt" id="usage">
+      <div class="container">
+        <h2 class="section-title">Como usar</h2>
+        <p class="section-subtitle">Clique com o botão direito em uma imagem, pasta ou seleção múltipla.</p>
+        <div class="usage-grid">
+          <div class="usage-card">
+            <h3>🖼️ Imagem única</h3>
+            <ul>
+              <li>Identificar</li>
+              <li>Remover marca visível</li>
+              <li>Remover metadados de IA</li>
+              <li>Remover tudo</li>
+            </ul>
+          </div>
+          <div class="usage-card">
+            <h3>📚 Múltiplas imagens</h3>
+            <ul>
+              <li>Processar em lote (visible)</li>
+            </ul>
+          </div>
+          <div class="usage-card">
+            <h3>📁 Pasta</h3>
+            <ul>
+              <li>Processar em lote (visible)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="usage-note">
+          <p>💡 Os arquivos limpos são salvos <strong>ao lado do original</strong> como <code>&lt;nome&gt;_ai_cleaned.&lt;ext&gt;</code>. O modo <strong>Identificar</strong> gera <code>&lt;nome&gt;_ai_analysis.txt</code> e abre no editor padrão.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Desinstalar -->
+    <section class="section" id="uninstall">
+      <div class="container">
+        <h2 class="section-title">Desinstalação</h2>
+        <p class="section-subtitle">Remove todos os menus de contexto e o script auxiliar — sem tocar nas suas imagens limpas.</p>
+        <div class="code-block code-block-lg">
+          <button class="copy-btn" data-copy="curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/uninstall.sh | bash" aria-label="Copiar">Copiar</button>
+          <pre><code>curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/uninstall.sh | bash</code></pre>
+        </div>
+        <p class="step-note">A desinstalação <strong>não</strong> remove o CLI <code>remove-ai-watermarks</code> nem os arquivos <code>_ai_cleaned</code> que você gerou.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <div>
+        <p class="footer-brand">🛡️ Remove AI Watermarks — Context Menus</p>
+        <p class="footer-desc">Um front-end open source para o <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">remove-ai-watermarks</a>.</p>
+      </div>
+      <div class="footer-links">
+        <a href="https://github.com/zonaro/remove-ai-watermarks-contextmenu" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://github.com/zonaro/remove-ai-watermarks-contextmenu/issues" target="_blank" rel="noopener">Issues</a>
+        <a href="https://github.com/wiltodelta/remove-ai-watermarks" target="_blank" rel="noopener">CLI</a>
+      </div>
+    </div>
+    <div class="container footer-bottom">
+      <p>Feito com 💜 para a comunidade Linux · <span id="year"></span></p>
+    </div>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
