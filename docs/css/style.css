@@ -366,6 +366,12 @@ body {
   background: var(--surface-hover);
   border: 1px solid var(--border);
 }
+.manager-logo img {
+  width: 38px;
+  height: 38px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+}
 .manager-card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 4px; }
 .manager-de { display: block; color: var(--accent-1); font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
 .manager-mech {

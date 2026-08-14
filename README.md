@@ -6,14 +6,14 @@ CLI, so you can inspect and clean AI watermarks directly from your file manager.
 
 Works on **multiple desktop environments** and file managers:
 
-| Desktop | File manager | Mechanism |
-|---|---|---|
-| KDE Plasma | Dolphin / Konqueror | KDE ServiceMenus |
-| GNOME | Nautilus | Nautilus scripts |
-| XFCE | Thunar | Thunar custom actions (`uca.xml`) |
-| Cinnamon | Nemo | Nemo actions (`.nemo_action`) |
-| MATE | Caja | Caja scripts |
-| LXDE / LXQt | PCManFM | DES-EMA actions |
+| Desktop     | File manager        | Mechanism                         |
+| ----------- | ------------------- | --------------------------------- |
+| KDE Plasma  | Dolphin / Konqueror | KDE ServiceMenus                  |
+| GNOME       | Nautilus            | Nautilus scripts                  |
+| XFCE        | Thunar              | Thunar custom actions (`uca.xml`) |
+| Cinnamon    | Nemo                | Nemo actions (`.nemo_action`)     |
+| MATE        | Caja                | Caja scripts                      |
+| LXDE / LXQt | PCManFM             | DES-EMA actions                   |
 
 The installer detects your desktop environment and the file managers
 installed, and installs the menu in **all compatible managers** found.
@@ -41,11 +41,11 @@ installed, and installs the menu in **all compatible managers** found.
 
 Right-click an image (or a folder / multiple images) → **Remove AI Watermarks** submenu:
 
-| Selection | Menu items |
-|---|---|
-| Single image | Identify · Remove visible mark · Remove AI metadata · Remove everything |
-| Multiple images (2+) | Batch process (visible) |
-| Folder | Batch process (visible) |
+| Selection            | Menu items                                                              |
+| -------------------- | ----------------------------------------------------------------------- |
+| Single image         | Identify · Remove visible mark · Remove AI metadata · Remove everything |
+| Multiple images (2+) | Batch process (visible)                                                 |
+| Folder               | Batch process (visible)                                                 |
 
 - Output files are written **next to the original** as `<name>_ai_cleaned.<ext>`.
 - **Identify** writes a full analysis report to `<name>_ai_analysis.txt` and
@@ -69,11 +69,11 @@ curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-context
 
 Options:
 
-| Flag | Effect |
-|---|---|
-| `--all` | Install in every supported file manager |
-| `--no-deps` | Skip installing the `remove-ai-watermarks` CLI |
-| `--force-deps` | Reinstall the CLI even if already present |
+| Flag           | Effect                                         |
+| -------------- | ---------------------------------------------- |
+| `--all`        | Install in every supported file manager        |
+| `--no-deps`    | Skip installing the `remove-ai-watermarks` CLI |
+| `--force-deps` | Reinstall the CLI even if already present      |
 
 After installing, restart your file manager once so the menu appears:
 
@@ -101,15 +101,15 @@ curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-context
 
 ## What gets installed
 
-| File manager | Files |
-|---|---|
-| Dolphin (KDE) | `~/.local/share/kio/servicemenus/remove-ai-watermarks*.desktop` |
-| Nautilus (GNOME) | `~/.local/share/nautilus/scripts/Remove AI Watermarks/*` |
-| Thunar (XFCE) | `~/.config/Thunar/uca.xml` (adds `raiw-*` actions) |
-| Nemo (Cinnamon) | `~/.local/share/nemo/actions/remove-ai-watermarks*.nemo_action` |
-| Caja (MATE) | `~/.local/share/caja/scripts/Remove AI Watermarks/*` |
+| File manager        | Files                                                               |
+| ------------------- | ------------------------------------------------------------------- |
+| Dolphin (KDE)       | `~/.local/share/kio/servicemenus/remove-ai-watermarks*.desktop`     |
+| Nautilus (GNOME)    | `~/.local/share/nautilus/scripts/Remove AI Watermarks/*`            |
+| Thunar (XFCE)       | `~/.config/Thunar/uca.xml` (adds `raiw-*` actions)                  |
+| Nemo (Cinnamon)     | `~/.local/share/nemo/actions/remove-ai-watermarks*.nemo_action`     |
+| Caja (MATE)         | `~/.local/share/caja/scripts/Remove AI Watermarks/*`                |
 | PCManFM (LXDE/LXQt) | `~/.local/share/file-manager/actions/remove-ai-watermarks*.desktop` |
-| Shared | `~/.local/share/remove-ai-watermarks-kde/raiw-helper.sh` |
+| Shared              | `~/.local/share/remove-ai-watermarks-kde/raiw-helper.sh`            |
 
 Diagnostics are logged to `~/.local/share/remove-ai-watermarks-kde/raiw.log`.
 
