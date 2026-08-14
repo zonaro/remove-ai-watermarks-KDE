@@ -3,7 +3,7 @@
 ## Repository layout
 
 ```
-remove-ai-watermarks-KDE/
+remove-ai-watermarks-contextmenu/
 ├── install.sh              # Main installer (dispatcher): detects DE + FMs, dispatches
 ├── uninstall.sh            # Main uninstaller (dispatcher): removes all integrations
 ├── raiw-helper.sh          # Shared helper executed by the menus (single source of truth)
@@ -40,7 +40,7 @@ install.sh
 `uninstall.sh` calls every `uninstall-<fm>.sh` unconditionally (idempotent),
 then removes `$APP_DIR`.
 
-`BASE_URL="${RAIW_BASE_URL:-https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main}"`
+`BASE_URL="${RAIW_BASE_URL:-https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main}"`
 — `RAIW_BASE_URL` can be overridden for local testing (e.g. `file://$PWD`).
 
 ## What gets installed

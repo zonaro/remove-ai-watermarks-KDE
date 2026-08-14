@@ -52,7 +52,7 @@ Right-click an image (or a folder / multiple images) → **Remove AI Watermarks*
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash
 ```
 
 The installer detects your desktop environment and installed file managers and
@@ -60,7 +60,7 @@ installs the menu in all of them. To force installation in every supported
 manager:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main/install.sh | bash -s -- --all
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash -s -- --all
 ```
 
 After installing, restart your file manager once so the menu appears:
@@ -76,7 +76,7 @@ caja -q              # MATE
 ## Uninstall
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/uninstall.sh | bash
 ```
 
 Uninstalling removes the context menus and the helper script, but **does not**

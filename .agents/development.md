@@ -67,17 +67,17 @@ ls ~/.local/share/remove-ai-watermarks-kde/                # → nothing
 The documented install path is:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash
 ```
 
 Because the raw URL points at the `main` branch, **pushing to `main` is the
 release step**. Verify the raw URLs resolve after pushing:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main/install.sh | bash -n
-curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main/uninstall.sh | bash -n
-curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main/raiw-helper.sh | bash -n
-curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-KDE/main/install-dolphin.sh | bash -n
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install.sh | bash -n
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/uninstall.sh | bash -n
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/raiw-helper.sh | bash -n
+curl -fsSL https://raw.githubusercontent.com/zonaro/remove-ai-watermarks-contextmenu/main/install-dolphin.sh | bash -n
 # ... and so on for every install-*/uninstall-* script
 ```
 
